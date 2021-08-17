@@ -1,84 +1,104 @@
 require(lubridate)
 require(tidyverse)
 
-preimp = c("GLOBAL.UNIQUE.IDENTIFIER","CATEGORY","COMMON.NAME","SCIENTIFIC.NAME","OBSERVATION.COUNT",
+preimp <- c("GLOBAL.UNIQUE.IDENTIFIER","CATEGORY","COMMON.NAME","SCIENTIFIC.NAME","OBSERVATION.COUNT",
            "LOCALITY.ID","LOCALITY.TYPE","REVIEWED","APPROVED","STATE","COUNTY","LAST.EDITED.DATE",
            "LATITUDE","LONGITUDE","OBSERVATION.DATE","TIME.OBSERVATIONS.STARTED","OBSERVER.ID",
            "PROTOCOL.TYPE","DURATION.MINUTES","EFFORT.DISTANCE.KM","LOCALITY","HAS.MEDIA","BREEDING.CODE",
-           "NUMBER.OBSERVERS","ALL.SPECIES.REPORTED","GROUP.IDENTIFIER","SAMPLING.EVENT.IDENTIFIER")
+           "NUMBER.OBSERVERS","ALL.SPECIES.REPORTED","GROUP.IDENTIFIER","SAMPLING.EVENT.IDENTIFIER",
+           "TRIP.COMMENTS")
 
-rawpath = "ebd_IN_202106_202106_relJun-2021.txt"
+rawpath <- "ebd_IN_202107_202107_relJul-2021.txt"
 
-nms = read.delim(rawpath, nrows = 1, sep = "\t", header = T, quote = "", stringsAsFactors = F, 
+# reading in only one row to then select only required columns
+nms <- read.delim(rawpath, nrows = 1, sep = "\t", header = T, quote = "", stringsAsFactors = F, 
                  na.strings = c(""," ",NA))
-nms = names(nms)
-nms[!(nms %in% preimp)] = "NULL"
-nms[nms %in% preimp] = NA
-
-data = read.delim(rawpath, colClasses = nms, sep = "\t", header = T, quote = "", 
+nms <- names(nms)
+nms[!(nms %in% preimp)] <- "NULL"
+nms[nms %in% preimp] <- NA
+# using nms object to filter columns read from the raw data
+data <- read.delim(rawpath, colClasses = nms, sep = "\t", header = T, quote = "", 
                   stringsAsFactors = F, na.strings = c(""," ",NA))
 
-days = c(31,28,31,30,31,30,31,31,30,31,30,31)
-cdays = c(0,31,59,90,120,151,181,212,243,273,304,334)
+data <- data %>% mutate(OBSERVATION.DATE = as.Date(OBSERVATION.DATE), 
+                        MONTH = month(OBSERVATION.DATE),
+                        DAYM = day(OBSERVATION.DATE))
 
-data = data %>%
-  mutate(OBSERVATION.DATE = as.Date(OBSERVATION.DATE), 
-         month = month(OBSERVATION.DATE),
-         daym = day(OBSERVATION.DATE))
-
-data0 = data
-datas = data %>% filter(CATEGORY %in% c("species","issf"))
-
-totobs = length(data0$COMMON.NAME)
-totlists = length(unique(data0$SAMPLING.EVENT.IDENTIFIER))
-totbir = length(unique(data0$OBSERVER.ID))
-totspecs = length(unique(datas$COMMON.NAME))
-media = data0 %>%
-  group_by(SAMPLING.EVENT.IDENTIFIER) %>% filter(any(HAS.MEDIA == 1)) %>%
-  ungroup
-media = length(unique(media$SAMPLING.EVENT.IDENTIFIER))
+data0 <- data
+datas <- data %>% filter(CATEGORY %in% c("species","issf"))
 
 
-nol = data0 %>% filter(ALL.SPECIES.REPORTED == 1)
-n = length(unique(nol$SAMPLING.EVENT.IDENTIFIER))
+
+###### monthly stats ###
+
+totbdr <- length(unique(data0$OBSERVER.ID))
+totobs <- length(data0$COMMON.NAME)
+totlists <- length(unique(data0$SAMPLING.EVENT.IDENTIFIER))
+totspecs <- length(unique(datas$COMMON.NAME))
+# complete lists
+clists <- data0 %>% filter(ALL.SPECIES.REPORTED == 1)
+totclists <- length(unique(clists$SAMPLING.EVENT.IDENTIFIER))
+# lists with media
+media <- data0 %>% group_by(SAMPLING.EVENT.IDENTIFIER) %>% 
+  filter(any(HAS.MEDIA == 1)) %>% ungroup
+totmedia <- length(unique(media$SAMPLING.EVENT.IDENTIFIER))
 
 
-############# to check for the basic no Xs, at least 30 lists from a single location
 
-data1 = data0 %>% filter(ALL.SPECIES.REPORTED == 1, DURATION.MINUTES >= 14.5) 
+###### monthly challenge (July) winners/results ###
 
-data2 = data1 %>%
-  group_by(SAMPLING.EVENT.IDENTIFIER) %>% filter(!any(OBSERVATION.COUNT == "X")) %>%
-  ungroup
+# basic eligible list filter, at least 31 lists
+data1 <- data0 %>% filter(ALL.SPECIES.REPORTED == 1, DURATION.MINUTES >= 14) %>% 
+         group_by(SAMPLING.EVENT.IDENTIFIER) %>% filter(!any(OBSERVATION.COUNT == "X")) %>%
+         ungroup
 
-data3 = data2 %>%
-  distinct(OBSERVER.ID,LOCALITY,SAMPLING.EVENT.IDENTIFIER)
+data2 <- data1 %>% distinct(OBSERVER.ID,SAMPLING.EVENT.IDENTIFIER,TRIP.COMMENTS)
 
-data4 = data3 %>%
-  group_by(OBSERVER.ID,LOCALITY) %>% summarize(count = n())
+data3 <- data2 %>% group_by(OBSERVER.ID) %>% 
+         summarise(COUNT = n()) %>% filter(COUNT >= 31)
 
-data5 = data4 %>% filter(count >= 30)
+# with wetland
+data4 <- data2 %>% filter(grepl("etland", TRIP.COMMENTS))
+
+data5 <- data4 %>% group_by(OBSERVER.ID) %>% 
+         summarise(WCOUNT = n_distinct(SAMPLING.EVENT.IDENTIFIER)) %>% filter(WCOUNT >= 7)
+
+data6 <- data3 %>% filter(OBSERVER.ID %in% data5$OBSERVER.ID)
+data7 <- left_join(data6,data5)
+
+# sound recordings
+sound <- read.csv("ML_2021-08-17T00-41_audio_IN.csv", header = T, stringsAsFactors = F)
+sound <- sound %>% distinct(Recordist,eBird.Checklist.ID)
+names(sound) <- c("FULL.NAME","SAMPLING.EVENT.IDENTIFIER")
+
+data8 <- data2 %>%  
+         filter(SAMPLING.EVENT.IDENTIFIER %in% sound$SAMPLING.EVENT.IDENTIFIER) %>% 
+         group_by(OBSERVER.ID) %>% 
+         summarise(SCOUNT = n_distinct(SAMPLING.EVENT.IDENTIFIER)) %>% filter(SCOUNT >= 7)
+
+data9 <-  data8 %>% filter(OBSERVER.ID %in% data7$OBSERVER.ID)
+data10 <- left_join(data9,data7)
+
+
 
 ####### linking unique ID with names of eBird users ### 
 
-data5$obs.id.num <- gsub("[[:alpha:]]", "", data5$OBSERVER.ID)
+eBird.users <- read.delim("ebd_users_relJun-2021.txt", sep = "\t", header = T, quote = "", 
+                          stringsAsFactors = F, na.strings = c(""," ",NA))
+names(eBird.users) <- c("OBSERVER.ID","FIRST.NAME","LAST.NAME")
+eBird.users <- eBird.users %>% transmute(OBSERVER.ID = OBSERVER.ID,
+                                         FULL.NAME = paste(FIRST.NAME, LAST.NAME, sep = " "))
 
-eBird.users = read.delim("ebd_users_relFeb-2021.txt", sep = "\t", header = T, quote = "", stringsAsFactors = F, 
-                         na.strings = c(""," ",NA))
-names(eBird.users) = c("USER_ID","FIRST_NAME","LAST_NAME")
-eBird.users = eBird.users %>% mutate(FULL.NAME = paste(FIRST_NAME, LAST_NAME, sep = " "))
-eBird.users$obs.id.num = gsub("[[:alpha:]]", "", eBird.users$USER_ID)
+data11 <- left_join(data10, eBird.users)
 
-data5 = left_join(data5, eBird.users)
-
-write.csv(data5, "june-2021-challenge-results.csv", row.names = F)
+write.csv(data11, "monthly-challenge-results-2021-07.csv", row.names = F)
 
 
-##########
+####### random selection ###
 
-a = read.csv("june-2021-challenge-results.csv")
-a = a %>% filter(FULL.NAME != "MetalClicks Ajay Ashok")
-set.seed(n)
-sample(a$FULL.NAME, 1)
+a <- read.csv("monthly-challenge-results-2021-07.csv")
+a <- a %>% filter(FULL.NAME != "MetalClicks Ajay Ashok") # removes NAs too
+set.seed(10)
+filter(a, OBSERVER.ID==sample(a$OBSERVER.ID, 1))
 
-#winner Claudia Pinheiro from Avadi, Tamil Nadu
+# winner Anuj Saikia from ___
