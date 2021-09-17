@@ -35,7 +35,7 @@ eBird.users <- eBird.users %>% transmute(OBSERVER.ID = OBSERVER.ID,
 
 
 
-###### Debashis Chowdhury
+###### Debashis Chowdhury ####
 
 dataDC <- left_join(data, eBird.users) %>% filter(FULL.NAME == "Debashis Chowdhury") %>% 
           arrange(SAMPLING.EVENT.IDENTIFIER)
@@ -46,7 +46,7 @@ write.csv(dataDC, "monthly-challenge-results-2021-07_DebCho.csv", row.names = F)
 
 
 
-###### Kalpana Jayaraman
+###### Kalpana Jayaraman ####
 
 dataKJ <- left_join(data, eBird.users) %>% filter(FULL.NAME == "kalpana jayaraman") %>% 
           arrange(SAMPLING.EVENT.IDENTIFIER)
@@ -87,3 +87,40 @@ write.csv(dataKJ, "monthly-challenge-results-2021-07_KalJay.csv", row.names = F)
 write.csv(data10, "monthly-challenge-results-2021-07_KalJay_summary.csv", row.names = F)
 
 ## only one audio in July
+
+
+
+###### Ashok Agarwal ####
+
+dataAA <- left_join(data, eBird.users) %>% filter(FULL.NAME == "Ashok Agarwal") %>% 
+          arrange(SAMPLING.EVENT.IDENTIFIER)
+
+write.csv(dataAA, "monthly-challenge-results-2021-07_AshAga.csv", row.names = F)
+
+## no checklist comments in data download
+
+###### Rahul Singh ####
+
+dataRS <- left_join(data, eBird.users) %>% filter(FULL.NAME == "Rahul Singh") %>% 
+  arrange(SAMPLING.EVENT.IDENTIFIER)
+
+eBird.users %>% filter(FULL.NAME == "Rahul Singh")
+data %>% filter(OBSERVER.ID %in% c("obsr1972797","obsr2495022"))
+data %>% filter(OBSERVER.ID == "obsr1972797" | OBSERVER.ID == "obsr2495022")
+
+
+###### Checklist comments issue ####
+
+load("ebd_IN_relAug-2021_AUG.RData")
+
+# data <- data %>% filter(LOCALITY == "Kousapara, Kanjikode, Palakkad")
+# my observer.ID is obsr841592
+
+data <- data %>% filter(OBSERVER.ID == "obsr841592")
+
+# I selected the hide option after 21st and before 31st (lists from both dates have comments). 
+# I unchecked it this morning, but the Aug release had already been made available yesterday.
+# So, it seems that the hidden comments do not appear in the raw data download, even for 
+# oneself. And it only depends on whether or not the option in preferences is checked 
+# (or not) at the time of preparation of the dataset (even older comments might be hidden).
+
