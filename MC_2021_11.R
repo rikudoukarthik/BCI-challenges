@@ -30,7 +30,7 @@ data1 <- data0 %>% filter(ALL.SPECIES.REPORTED == 1, DURATION.MINUTES >= 14) %>%
   group_by(SAMPLING.EVENT.IDENTIFIER) %>% filter(!any(OBSERVATION.COUNT == "X")) %>% ungroup()
 
 # at least 1 list in a day 
-data2 <- data1 %>% distinct(OBSERVER.ID, SAMPLING.EVENT.IDENTIFIER) %>% 
+data2 <- data1 %>% distinct(OBSERVER.ID, DAY.M, SAMPLING.EVENT.IDENTIFIER) %>% 
   group_by(OBSERVER.ID, DAY.M) %>% summarise(COUNT = n()) %>% 
   ungroup() %>% group_by(OBSERVER.ID) %>% 
   complete(DAY.M = (1:30), fill = list(COUNT = 0)) %>%  
@@ -50,7 +50,7 @@ data3c <- data2 %>% filter(DAY.M %in% 13:30) %>%
   ungroup()
 
 
-data4 <- data3a %>% filter(OBSERVER.ID %in% data3b$OBSERVER.ID) %>% select(OBSERVER.ID)
+data4 <- data3a %>% filter(OBSERVER.ID %in% data3b$OBSERVER.ID) %>% distinct(OBSERVER.ID)
 
 data5 <- data4 %>% filter(OBSERVER.ID %in% data3c$OBSERVER.ID)
 
@@ -73,4 +73,4 @@ a <- a %>% filter(FULL.NAME != "MetalClicks Ajay Ashok") # removes NAs too
 set.seed(10)
 filter(a, OBSERVER.ID==sample(a$OBSERVER.ID, 1))
 
-# winner shyamkumar puravankara
+# winner Chitra Shanker
