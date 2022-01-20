@@ -8,7 +8,7 @@ preimp <- c("CATEGORY","COMMON.NAME","SCIENTIFIC.NAME","OBSERVATION.COUNT",
             "NUMBER.OBSERVERS","ALL.SPECIES.REPORTED","GROUP.IDENTIFIER","SAMPLING.EVENT.IDENTIFIER",
             "TRIP.COMMENTS")
 
-rawpath <- "ebd_IN_202107_202107_relJul-2021.txt"
+rawpath <- "2021/ebd_IN_202107_202107_relJul-2021.txt"
 
 # reading in only one row to then select only required columns
 nms <- read.delim(rawpath, nrows = 1, sep = "\t", header = T, quote = "", stringsAsFactors = F, 
@@ -40,7 +40,7 @@ eBird.users <- eBird.users %>% transmute(OBSERVER.ID = OBSERVER.ID,
 dataDC <- left_join(data, eBird.users) %>% filter(FULL.NAME == "Debashis Chowdhury") %>% 
           arrange(SAMPLING.EVENT.IDENTIFIER)
 
-write.csv(dataDC, "monthly-challenge-results-2021-07_DebCho.csv", row.names = F)
+write.csv(dataDC, "Troubleshooting/monthly-challenge-results-2021-07_DebCho.csv", row.names = F)
 
 ## no checklist comments in data download (probably added later)
 
@@ -71,7 +71,7 @@ data6 <- data3 %>% filter(OBSERVER.ID %in% data5$OBSERVER.ID)
 data7 <- left_join(data6,data5)
 
 # sound recordings
-sound <- read.csv("ML_2021-08-17T00-41_audio_IN.csv", header = T, stringsAsFactors = F)
+sound <- read.csv("2021/ML_2021-08-17T00-41_audio_IN.csv", header = T, stringsAsFactors = F)
 sound <- sound %>% distinct(Recordist,eBird.Checklist.ID)
 names(sound) <- c("FULL.NAME","SAMPLING.EVENT.IDENTIFIER")
 
@@ -83,8 +83,8 @@ data8 <- data2 %>%
 data9 <-  data8 %>% filter(OBSERVER.ID %in% data7$OBSERVER.ID)
 data10 <- left_join(data9,data7)
 
-write.csv(dataKJ, "monthly-challenge-results-2021-07_KalJay.csv", row.names = F)
-write.csv(data10, "monthly-challenge-results-2021-07_KalJay_summary.csv", row.names = F)
+write.csv(dataKJ, "Troubleshooting/monthly-challenge-results-2021-07_KalJay.csv", row.names = F)
+write.csv(data10, "Troubleshooting/monthly-challenge-results-2021-07_KalJay_summary.csv", row.names = F)
 
 ## only one audio in July
 
@@ -95,7 +95,7 @@ write.csv(data10, "monthly-challenge-results-2021-07_KalJay_summary.csv", row.na
 dataAA <- left_join(data, eBird.users) %>% filter(FULL.NAME == "Ashok Agarwal") %>% 
           arrange(SAMPLING.EVENT.IDENTIFIER)
 
-write.csv(dataAA, "monthly-challenge-results-2021-07_AshAga.csv", row.names = F)
+write.csv(dataAA, "Troubleshooting/monthly-challenge-results-2021-07_AshAga.csv", row.names = F)
 
 ## no checklist comments in data download
 
@@ -111,7 +111,7 @@ data %>% filter(OBSERVER.ID == "obsr1972797" | OBSERVER.ID == "obsr2495022")
 
 ###### Checklist comments issue ####
 
-load("ebd_IN_relAug-2021_AUG.RData")
+load("2021/ebd_IN_relAug-2021_AUG.RData")
 
 # data <- data %>% filter(LOCALITY == "Kousapara, Kanjikode, Palakkad")
 # my observer.ID is obsr841592

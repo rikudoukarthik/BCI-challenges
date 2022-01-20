@@ -1,6 +1,6 @@
 library(tidyverse)
 
-load("ebd_IN_relOct-2021_OCT.RData")
+load("2021/ebd_IN_relOct-2021_OCT.RData")
 
 data0 <- data 
 datas <- data %>% filter(CATEGORY %in% c("species","issf"))
@@ -79,11 +79,11 @@ eBird.users <- eBird.users %>% transmute(OBSERVER.ID = OBSERVER.ID,
 
 data7 <- left_join(data6b, eBird.users)
 
-write.csv(data7, "MC_results_2021_10.csv", row.names = F)
+write.csv(data7, "2021/MC_results_2021_10.csv", row.names = F)
 
 
 # random selection 
-a <- read.csv("MC_results_2021_10.csv")
+a <- read.csv("2021/MC_results_2021_10.csv")
 a <- a %>% filter(FULL.NAME != "MetalClicks Ajay Ashok") # removes NAs too
 set.seed(10)
 filter(a, OBSERVER.ID==sample(a$OBSERVER.ID, 1))

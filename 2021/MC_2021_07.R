@@ -8,7 +8,7 @@ preimp <- c("GLOBAL.UNIQUE.IDENTIFIER","CATEGORY","COMMON.NAME","SCIENTIFIC.NAME
            "NUMBER.OBSERVERS","ALL.SPECIES.REPORTED","GROUP.IDENTIFIER","SAMPLING.EVENT.IDENTIFIER",
            "TRIP.COMMENTS")
 
-rawpath <- "ebd_IN_202107_202107_relJul-2021.txt"
+rawpath <- "2021/ebd_IN_202107_202107_relJul-2021.txt"
 
 # reading in only one row to then select only required columns
 nms <- read.delim(rawpath, nrows = 1, sep = "\t", header = T, quote = "", stringsAsFactors = F, 
@@ -67,7 +67,7 @@ data6 <- data3 %>% filter(OBSERVER.ID %in% data5$OBSERVER.ID)
 data7 <- left_join(data6,data5)
 
 # sound recordings
-sound <- read.csv("ML_2021-08-17T00-41_audio_IN.csv", header = T, stringsAsFactors = F)
+sound <- read.csv("2021/ML_2021-08-17T00-41_audio_IN.csv", header = T, stringsAsFactors = F)
 sound <- sound %>% distinct(Recordist,eBird.Checklist.ID)
 names(sound) <- c("FULL.NAME","SAMPLING.EVENT.IDENTIFIER")
 
@@ -91,12 +91,12 @@ eBird.users <- eBird.users %>% transmute(OBSERVER.ID = OBSERVER.ID,
 
 data11 <- left_join(data10, eBird.users)
 
-write.csv(data11, "monthly-challenge-results-2021-07.csv", row.names = F)
+write.csv(data11, "2021/MC_results_2021_07.csv", row.names = F)
 
 
 ####### random selection ###
 
-a <- read.csv("monthly-challenge-results-2021-07.csv")
+a <- read.csv("2021/MC_results_2021_07.csv")
 a <- a %>% filter(FULL.NAME != "MetalClicks Ajay Ashok") # removes NAs too
 set.seed(10)
 filter(a, OBSERVER.ID==sample(a$OBSERVER.ID, 1))

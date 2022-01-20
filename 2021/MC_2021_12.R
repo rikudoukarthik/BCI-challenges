@@ -1,7 +1,7 @@
 library(tidyverse)
 library(magrittr)
 
-load("ebd_IN_relDec-2021_DEC.RData")
+load("2021/ebd_IN_relDec-2021_DEC.RData")
 
 data0 <- data 
 datas <- data %>% filter(CATEGORY %in% c("species","issf"))
@@ -46,7 +46,7 @@ data2 <- data1 %>%
 
 # at least 5 media lists
 
-media_csv_names <- list.files(path = "MC_2021_12_media/",
+media_csv_names <- list.files(path = "2021/MC_2021_12_media/",
                               pattern = "*.csv",
                               full.names = T)
 
@@ -85,12 +85,12 @@ data6 <- left_join(data5, eBird.users) %>%
   mutate(PROP.MLISTS = M.LISTS/NO.LISTS) %>% 
   arrange(desc(PROP.MLISTS))
 
-write.csv(data6, "MC_results_2021_12.csv", row.names = F)
+write.csv(data6, "2021/MC_results_2021_12.csv", row.names = F)
 
 
 
 # random selection 
-a <- read.csv("MC_results_2021_12.csv")
+a <- read.csv("2021/MC_results_2021_12.csv")
 a <- a %>% filter(FULL.NAME != "MetalClicks Ajay Ashok") # removes NAs too
 set.seed(10)
 filter(a, OBSERVER.ID==sample(a$OBSERVER.ID, 1))

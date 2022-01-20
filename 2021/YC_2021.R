@@ -2,6 +2,7 @@ library(lubridate)
 library(tidyverse)
 library(magrittr)
 
+# place file in directory
 load("ebd_IN_relDec-2021.RData")
 
 
@@ -68,10 +69,10 @@ data2 <- data1 %>%
 # prolific eBirders
 data3 <- left_join(data2, eBird.users) %>% 
   arrange(desc(NO.LISTS))
-write.csv(data3, "YC_2021_results_prolific.csv", row.names = F)
+write.csv(data3, "2021/YC_2021_results_prolific.csv", row.names = F)
 
 # random selection 
-a <- read.csv("YC_2021_results_prolific.csv")
+a <- read.csv("2021/YC_2021_results_prolific.csv")
 a <- a %>% filter(FULL.NAME != "MetalClicks Ajay Ashok") # removes NAs too
 set.seed(20211)
 filter(a, OBSERVER.ID == sample(a$OBSERVER.ID, 1))
@@ -100,10 +101,10 @@ data2 <- data1 %>%
 
 # consistent eBirders
 data3 <- left_join(data2, eBird.users)
-write.csv(data3, "YC_2021_results_consistent.csv", row.names = F)
+write.csv(data3, "2021/YC_2021_results_consistent.csv", row.names = F)
 
 # random selection 
-a <- read.csv("YC_2021_results_consistent.csv")
+a <- read.csv("2021/YC_2021_results_consistent.csv")
 a <- a %>% filter(FULL.NAME != "MetalClicks Ajay Ashok") # removes NAs too
 set.seed(20212)
 filter(a, OBSERVER.ID == sample(a$OBSERVER.ID, 1))
@@ -124,10 +125,10 @@ data2 <- data1 %>%
 
 # adventurous eBirders
 data3 <- left_join(data2, eBird.users)
-write.csv(data3, "YC_2021_results_adventurous.csv", row.names = F)
+write.csv(data3, "2021/YC_2021_results_adventurous.csv", row.names = F)
 
 # random selection 
-a <- read.csv("YC_2021_results_adventurous.csv")
+a <- read.csv("2021/YC_2021_results_adventurous.csv")
 a <- a %>% 
   filter(!FULL.NAME %in% c("MetalClicks Ajay Ashok", "Ashwin Viswanathan")) # removes NAs too
 set.seed(20213)
@@ -145,10 +146,10 @@ data2 <- data1 %>%
 
 # faithful eBirders
 data3 <- left_join(data2, eBird.users)
-write.csv(data3, "YC_2021_results_faithful.csv", row.names = F)
+write.csv(data3, "2021/YC_2021_results_faithful.csv", row.names = F)
 
 # random selection 
-a <- read.csv("YC_2021_results_faithful.csv")
+a <- read.csv("2021/YC_2021_results_faithful.csv")
 a <- a %>% 
   filter(!FULL.NAME %in% c("MetalClicks Ajay Ashok")) # removes NAs too
 set.seed(20214)
@@ -173,10 +174,10 @@ data3 <- data2 %>%
 # dedicated eBirders
 data4 <- left_join(data3, eBird.users) %>% 
   arrange(desc(B.TIME.H))
-write.csv(data4, "YC_2021_results_dedicated.csv", row.names = F)
+write.csv(data4, "2021/YC_2021_results_dedicated.csv", row.names = F)
 
 # random selection 
-a <- read.csv("YC_2021_results_dedicated.csv")
+a <- read.csv("2021/YC_2021_results_dedicated.csv")
 a <- a %>% 
   filter(!FULL.NAME %in% c("MetalClicks Ajay Ashok")) # removes NAs too
 set.seed(20215)
@@ -187,7 +188,7 @@ filter(a, OBSERVER.ID == sample(a$OBSERVER.ID, 1))
 
 ###### eBirder of the Year (eBirder of the Month >=9 months in 2021) ####
 
-MC_csv_names <- list.files(path = ".",
+MC_csv_names <- list.files(path = "2021/",
                            pattern = "MC_results_2021_",
                            full.names = T)
 
@@ -200,10 +201,10 @@ data_y <- MC_csv_names %>%
   arrange(desc(N.MONTHS))
 
 # eBirders of the Year
-write.csv(data_y, "YC_2021_results_eBoY.csv", row.names = F)
+write.csv(data_y, "2021/YC_2021_results_eBoY.csv", row.names = F)
 
 # random selection 
-a <- read.csv("YC_2021_results_eBoY.csv")
+a <- read.csv("2021/YC_2021_results_eBoY.csv")
 a <- a %>% 
   filter(!FULL.NAME %in% c("MetalClicks Ajay Ashok")) # removes NAs too
 set.seed(20216)
