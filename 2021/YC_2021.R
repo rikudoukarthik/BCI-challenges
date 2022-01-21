@@ -33,7 +33,7 @@ data1 <- data0 %>%
 
 
 # user information
-eBird.users <- read.delim("ebd_users_relJun-2021.txt", sep = "\t", header = T, quote = "", 
+eBird.users <- read.delim("ebd_users_relDec-2021.txt", sep = "\t", header = T, quote = "", 
                           stringsAsFactors = F, na.strings = c(""," ",NA))
 names(eBird.users) <- c("OBSERVER.ID","FIRST.NAME","LAST.NAME")
 eBird.users <- eBird.users %>% transmute(OBSERVER.ID = OBSERVER.ID,
@@ -77,7 +77,7 @@ a <- a %>% filter(FULL.NAME != "MetalClicks Ajay Ashok") # removes NAs too
 set.seed(20211)
 filter(a, OBSERVER.ID == sample(a$OBSERVER.ID, 1))
 
-# winner Premchand Reghuvaran
+# winner Raj Guhan
 
 
 ###### consistent eBirder (>=1 eligible list each day) ####
