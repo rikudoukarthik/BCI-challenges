@@ -69,13 +69,13 @@ data2 <- data1 %>%
 # prolific eBirders
 data3 <- left_join(data2, eBird.users) %>% 
   arrange(desc(NO.LISTS))
-write.csv(data3, "2021/YC_2021_results_prolific.csv", row.names = F)
+write.csv(data3, "2021/YC_2021_results_cat_prolific.csv", row.names = F)
 
 # random selection 
-a <- read.csv("2021/YC_2021_results_prolific.csv")
+a <- read.csv("2021/YC_2021_results_cat_prolific.csv")
 a <- a %>% filter(FULL.NAME != "MetalClicks Ajay Ashok") # removes NAs too
 set.seed(20211)
-filter(a, OBSERVER.ID == sample(a$OBSERVER.ID, 1))
+prolific <- a %>% filter(OBSERVER.ID == sample(a$OBSERVER.ID, 1))
 
 # winner Raj Guhan
 
@@ -101,13 +101,13 @@ data2 <- data1 %>%
 
 # consistent eBirders
 data3 <- left_join(data2, eBird.users)
-write.csv(data3, "2021/YC_2021_results_consistent.csv", row.names = F)
+write.csv(data3, "2021/YC_2021_results_cat_consistent.csv", row.names = F)
 
 # random selection 
-a <- read.csv("2021/YC_2021_results_consistent.csv")
+a <- read.csv("2021/YC_2021_results_cat_consistent.csv")
 a <- a %>% filter(FULL.NAME != "MetalClicks Ajay Ashok") # removes NAs too
 set.seed(20212)
-filter(a, OBSERVER.ID == sample(a$OBSERVER.ID, 1))
+consistent <- a %>% filter(OBSERVER.ID == sample(a$OBSERVER.ID, 1))
 
 # winner Steffin Babu
 
@@ -125,14 +125,14 @@ data2 <- data1 %>%
 
 # adventurous eBirders
 data3 <- left_join(data2, eBird.users)
-write.csv(data3, "2021/YC_2021_results_adventurous.csv", row.names = F)
+write.csv(data3, "2021/YC_2021_results_cat_adventurous.csv", row.names = F)
 
 # random selection 
-a <- read.csv("2021/YC_2021_results_adventurous.csv")
+a <- read.csv("2021/YC_2021_results_cat_adventurous.csv")
 a <- a %>% 
   filter(!FULL.NAME %in% c("MetalClicks Ajay Ashok", "Ashwin Viswanathan")) # removes NAs too
 set.seed(20213)
-filter(a, OBSERVER.ID == sample(a$OBSERVER.ID, 1))
+adventuruous <- a %>% filter(OBSERVER.ID == sample(a$OBSERVER.ID, 1))
 
 # winner Vivek Menon
 
@@ -146,14 +146,14 @@ data2 <- data1 %>%
 
 # faithful eBirders
 data3 <- left_join(data2, eBird.users)
-write.csv(data3, "2021/YC_2021_results_faithful.csv", row.names = F)
+write.csv(data3, "2021/YC_2021_results_cat_faithful.csv", row.names = F)
 
 # random selection 
-a <- read.csv("2021/YC_2021_results_faithful.csv")
+a <- read.csv("2021/YC_2021_results_cat_faithful.csv")
 a <- a %>% 
   filter(!FULL.NAME %in% c("MetalClicks Ajay Ashok")) # removes NAs too
 set.seed(20214)
-filter(a, OBSERVER.ID == sample(a$OBSERVER.ID, 1)) %>% slice(1)
+faithful <- a %>% filter(OBSERVER.ID == sample(a$OBSERVER.ID, 1)) %>% slice(1)
 
 # winner Janardhan Uppada
 
@@ -174,19 +174,24 @@ data3 <- data2 %>%
 # dedicated eBirders
 data4 <- left_join(data3, eBird.users) %>% 
   arrange(desc(B.TIME.H))
-write.csv(data4, "2021/YC_2021_results_dedicated.csv", row.names = F)
+write.csv(data4, "2021/YC_2021_results_cat_dedicated.csv", row.names = F)
 
 # random selection 
-a <- read.csv("2021/YC_2021_results_dedicated.csv")
+a <- read.csv("2021/YC_2021_results_cat_dedicated.csv")
 a <- a %>% 
   filter(!FULL.NAME %in% c("MetalClicks Ajay Ashok")) # removes NAs too
 set.seed(20215)
-filter(a, OBSERVER.ID == sample(a$OBSERVER.ID, 1)) 
+dedicated <- a %>% filter( OBSERVER.ID == sample(a$OBSERVER.ID, 1)) 
 
 # winner Chaiti Banerjee
 
 
 ###### eBirder of the Year (eBirder of the Month >=9 months in 2021) ####
+
+# selection of final excludes the category winners
+YC_cat_winners <- bind_rows(prolific, consistent, adventuruous, faithful, dedicated) %>% 
+  distinct(OBSERVER.ID, FULL.NAME)
+
 
 MC_csv_names <- list.files(path = "2021/",
                            pattern = "MC_results_2021_",
@@ -203,12 +208,49 @@ data_y <- MC_csv_names %>%
 # eBirders of the Year
 write.csv(data_y, "2021/YC_2021_results_eBoY.csv", row.names = F)
 
-# random selection 
-a <- read.csv("2021/YC_2021_results_eBoY.csv")
-a <- a %>% 
-  filter(!FULL.NAME %in% c("MetalClicks Ajay Ashok")) # removes NAs too
-set.seed(20216)
-filter(a, OBSERVER.ID == sample(a$OBSERVER.ID, 1)) 
+# winner Praveen Bennur
 
-# winner Steffin Babu
 
+###### troubleshooting ####
+
+# finding days when observers missed submitting an eligible list (for consistent eBirder)
+
+x <- data1 %>% 
+  filter(OBSERVER.ID == "obsr358210") %>% 
+  complete(OBSERVATION.DATE = seq.Date(as_date("2021-01-01"), as_date("2021-12-31"),
+                                       length.out = 365),
+           OBSERVER.ID = "obsr358210") %>% 
+  filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
+  select(OBSERVER.ID, OBSERVATION.DATE)
+
+y <- data1 %>% 
+  filter(OBSERVER.ID == "obsr603959") %>% 
+  complete(OBSERVATION.DATE = seq.Date(as_date("2021-01-01"), as_date("2021-12-31"),
+                                       length.out = 365),
+           OBSERVER.ID = "obsr603959") %>% 
+  filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
+  select(OBSERVER.ID, OBSERVATION.DATE)
+
+z <- data1 %>% 
+  filter(OBSERVER.ID == "obsr701947") %>% 
+  complete(OBSERVATION.DATE = seq.Date(as_date("2021-01-01"), as_date("2021-12-31"),
+                                       length.out = 365),
+           OBSERVER.ID = "obsr701947") %>% 
+  filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
+  select(OBSERVER.ID, OBSERVATION.DATE)
+
+a <- data1 %>% 
+  filter(OBSERVER.ID == "obsr689831") %>% 
+  complete(OBSERVATION.DATE = seq.Date(as_date("2021-01-01"), as_date("2021-12-31"),
+                                       length.out = 365),
+           OBSERVER.ID = "obsr689831") %>% 
+  filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
+  select(OBSERVER.ID, OBSERVATION.DATE)
+
+missed <- rbind(x, y, z, a) %>% 
+  left_join(eBird.users) %>% 
+  mutate(MISSED.DATE = OBSERVATION.DATE,
+         OBSERVATION.DATE = NULL)
+write_csv(missed, "2021/YC_2021_missed_consistent.csv")
+
+rm(x, y, z, a)
