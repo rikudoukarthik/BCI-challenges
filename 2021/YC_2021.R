@@ -247,10 +247,18 @@ a <- data1 %>%
   filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
   select(OBSERVER.ID, OBSERVATION.DATE)
 
-missed <- rbind(x, y, z, a) %>% 
+b <- data1 %>% 
+  filter(OBSERVER.ID == "obsr1365122") %>% 
+  complete(OBSERVATION.DATE = seq.Date(as_date("2021-01-01"), as_date("2021-12-31"),
+                                       length.out = 365),
+           OBSERVER.ID = "obsr1365122") %>% 
+  filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
+  select(OBSERVER.ID, OBSERVATION.DATE)
+
+missed <- rbind(x, y, z, a, b) %>% 
   left_join(eBird.users) %>% 
   mutate(MISSED.DATE = OBSERVATION.DATE,
          OBSERVATION.DATE = NULL)
 write_csv(missed, "2021/YC_2021_missed_consistent.csv")
 
-rm(x, y, z, a)
+rm(x, y, z, a, b)
