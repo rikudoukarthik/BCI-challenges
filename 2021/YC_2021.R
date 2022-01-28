@@ -255,7 +255,23 @@ b <- data1 %>%
   filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
   select(OBSERVER.ID, OBSERVATION.DATE)
 
-missed <- rbind(x, y, z, a, b) %>% 
+c <- data1 %>% 
+  filter(OBSERVER.ID == "obsr584849") %>% 
+  complete(OBSERVATION.DATE = seq.Date(as_date("2021-01-01"), as_date("2021-12-31"),
+                                       length.out = 365),
+           OBSERVER.ID = "obsr584849") %>% 
+  filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
+  select(OBSERVER.ID, OBSERVATION.DATE)
+
+d <- data1 %>% 
+  filter(OBSERVER.ID == "obsr1815505") %>% 
+  complete(OBSERVATION.DATE = seq.Date(as_date("2021-01-01"), as_date("2021-12-31"),
+                                       length.out = 365),
+           OBSERVER.ID = "obsr1815505") %>% 
+  filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
+  select(OBSERVER.ID, OBSERVATION.DATE)
+
+missed <- rbind(x, y, z, a, b, c, d) %>% 
   left_join(eBird.users) %>% 
   mutate(MISSED.DATE = OBSERVATION.DATE,
          OBSERVATION.DATE = NULL)
