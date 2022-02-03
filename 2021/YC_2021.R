@@ -19,6 +19,8 @@ filtGA <- groupaccs %>% filter(CATEGORY == "GA.1") %>% select(OBSERVER.ID)
 data0 <- data %>% 
   filter(YEAR == 2021) %>% 
   anti_join(filtGA) # removing data from group accounts
+
+save(data0, file = "2021/data_YC_2021.RData")
 rm(data)
 
 datas <- data0 %>% filter(CATEGORY %in% c("species","issf"))
@@ -271,10 +273,26 @@ d <- data1 %>%
   filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
   select(OBSERVER.ID, OBSERVATION.DATE)
 
-missed <- rbind(x, y, z, a, b, c, d) %>% 
+e <- data1 %>% 
+  filter(OBSERVER.ID == "obsr393275") %>% 
+  complete(OBSERVATION.DATE = seq.Date(as_date("2021-01-01"), as_date("2021-12-31"),
+                                       length.out = 365),
+           OBSERVER.ID = "obsr393275") %>% 
+  filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
+  select(OBSERVER.ID, OBSERVATION.DATE)
+
+f <- data1 %>% 
+  filter(OBSERVER.ID == "obsr944274") %>% 
+  complete(OBSERVATION.DATE = seq.Date(as_date("2021-01-01"), as_date("2021-12-31"),
+                                       length.out = 365),
+           OBSERVER.ID = "obsr944274") %>% 
+  filter(is.na(SAMPLING.EVENT.IDENTIFIER)) %>% 
+  select(OBSERVER.ID, OBSERVATION.DATE)
+
+missed <- rbind(x, y, z, a, b, c, d, e, f) %>% 
   left_join(eBird.users) %>% 
-  mutate(MISSED.DATE = OBSERVATION.DATE,
-         OBSERVATION.DATE = NULL)
+  rename(MISSED.DATE = OBSERVATION.DATE)
+
 write_csv(missed, "2021/YC_2021_missed_consistent.csv")
 
-rm(x, y, z, a, b)
+rm(x, y, z, a, b, c, d, e, f)
